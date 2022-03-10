@@ -1,0 +1,33 @@
+{
+  "name": "mrlancer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "register-local": "tsc && cp .env.local ./dist/.env && node dist/deploy-commands.js",
+    "start-local": "tsc && cp .env.local ./dist/.env && node dist/index.js",
+    "start-prod": "tsc && cp .env ./dist/.env && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "eslint": "^8.10.0",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^0.12.0",
+    "@discordjs/rest": "^0.3.0",
+    "@types/lodash": "^4.14.179",
+    "@types/pg": "^8.6.4",
+    "discord-api-types": "^0.28.0",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "lodash": "^4.17.21",
+    "pg": "^8.7.3"
+  }
+}
