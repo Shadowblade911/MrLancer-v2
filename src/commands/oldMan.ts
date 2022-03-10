@@ -5,9 +5,7 @@ import { DB_COMMANDS } from "../utils/postgresConnections";
 import { SlashCommandBuilder } from "@discordjs/builders";
 
 export const oldMan = async (interaction: CommandInteraction) => {
-  const pool = await DB_COMMANDS.connectToClient();
-  await errorMessage(pool, interaction, "Who are you calling *OLD* man?");
-  pool.release();
+  await errorMessage(interaction, "Who are you calling *OLD* man?");
 };
 
 oldMan.COMMAND_NAME = "oldman";

@@ -12,20 +12,20 @@ export const addBook = async (interaction: CommandInteraction) => {
   try {
 
     if(!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_GUILD)){
-      await errorMessage(pool, interaction, "You do not have permissions for this command!");
+      await errorMessage(interaction, "You do not have permissions for this command!");
       return;  
     }
 
     const type = interaction.options.getString(addBook.OPTIONS.kind, true);
 
     if(!BOOK_TYPE_ARGS.includes(type as BOOK_TYPES)){
-      await errorMessage(pool, interaction, `I don't know how to handle a type of ${type} `);
+      await errorMessage(interaction, `I don't know how to handle a type of ${type} `);
       return;  
     }
 
     const title = interaction.options.getString(addBook.OPTIONS.title, true);
     if(!title){
-      await errorMessage(pool, interaction, "I need a title!");
+      await errorMessage(interaction, "I need a title!");
       return;  
     }
       

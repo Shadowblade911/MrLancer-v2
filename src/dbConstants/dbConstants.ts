@@ -27,7 +27,7 @@ export type BOOK = {
     id: number;
     guild_id: string;
     title: string;
-    suggestion_type: BOOK_TYPES;
+    suggestion_type: number;
 }
 
 export type PROMPT = {

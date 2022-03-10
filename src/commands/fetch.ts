@@ -5,9 +5,7 @@ import { DB_COMMANDS } from "../utils/postgresConnections";
 import { SlashCommandBuilder } from "@discordjs/builders";
 
 export const fetch = async (interaction: CommandInteraction) => {
-  const pool = await DB_COMMANDS.connectToClient();
-  await errorMessage(pool, interaction, "Stop trying to make fetch happen!");
-  pool.release();
+  await errorMessage(interaction, "Stop trying to make fetch happen!");
 };
 
 fetch.COMMAND_NAME = "fetch";

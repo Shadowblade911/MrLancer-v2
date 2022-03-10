@@ -55,9 +55,7 @@ client.on("interactionCreate", async interaction => {
     break;
   }
   default: {
-    const pool = await DB_COMMANDS.connectToClient();
-    await errorMessage(pool, interaction, `I failed to understand what you meant by ${command}`);
-    pool.release();
+    await errorMessage(interaction, `I failed to understand what you meant by ${command}`);
   }
   }
 

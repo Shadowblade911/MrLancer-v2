@@ -18,7 +18,7 @@ export const prompt = async (interaction: CommandInteraction) => {
     );
 
     if(!result || result.length === 0){
-      await errorMessage(pool, interaction, "I was unable to find any prompts! Try adding some!");
+      await errorMessage(interaction, "I was unable to find any prompts! Try adding some!");
       return;
     }
 

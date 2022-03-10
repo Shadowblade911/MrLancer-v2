@@ -10,7 +10,7 @@ export const register = async (interaction: CommandInteraction) => {
     await DB_COMMANDS.registerGuild(pool, interaction.guildId, interaction);
   } catch(e) {
     console.log(e); 
-    await errorMessage(pool, interaction, "Something went wrong registering your server!");
+    await errorMessage(interaction, "Something went wrong registering your server!");
     return;
   } finally {
     pool.release();

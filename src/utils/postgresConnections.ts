@@ -1,4 +1,5 @@
 import { CommandInteraction } from "discord.js";
+import knex, { Knex } from "knex";
 import { Pool, PoolClient } from "pg";
 import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS } from "../dbConstants/dbConstants";
 import { errorMessage } from "./errorMessage";
@@ -41,6 +42,42 @@ const connectToClient = async () => {
   }
 };
 
+const knexConnect = async () => {
+  const {
+    PGUSER,
+    PGHOST,
+    PGPORT,
+    PGPASSWORD,
+    PGDATABASE,
+  } = process.env;
+
+  const connection = await knex({
+    client: 'pg',
+    connection: {
+      host : PGHOST,
+      port : Number(PGPORT),
+      user : PGUSER,
+      password : PGPASSWORD,
+      database : PGDATABASE,
+    }
+  });
+  
+  return connection;
+};
+
+const getBooksOfType = async (guildId, bookType: BOOK_TYPES): Promise<BOOK[]> => {
+  const {
+    TABLE,
+    GUILD_ID,
+    SUGGESTION_TYPE
+  } = DB_CONSTANTS.BOOKS;
+    
+  return (await knexConnect())<BOOK>(TABLE)
+    .select("*")
+    .where(SUGGESTION_TYPE, convertTypeToSmallInt(bookType))
+    .andWhere(GUILD_ID, [guildId, null])
+} 
+
 
 const getRandomBook = async (pool: PoolClient, guildId: string, bookType: BOOK_TYPES): Promise<BOOK[]> => {
   const {
@@ -57,6 +94,17 @@ const getRandomBook = async (pool: PoolClient, guildId: string, bookType: BOOK_T
 
   return books.rows as BOOK[];
 };
+
+const addBookKnex = async(connection: Knex, guildId: string, title: string, bookType: BOOK_TYPES) => {
+  const {
+    TABLE,
+  } = DB_CONSTANTS.BOOKS;
+    
+  const books = await (await knexConnect())<BOOK>(TABLE)
+  .insert({title: title, guild_id: guildId, suggestion_type: convertTypeToSmallInt(bookType)})
+
+  return books;
+}
 
 const addBook = async (pool: PoolClient, guildId: string, title: string, bookType: BOOK_TYPES) => {
     
@@ -139,7 +187,7 @@ const registerGuild = async (pool: PoolClient, guildId: string, interaction: Com
         result,
         timestame: Date.now()
       });
-      await errorMessage(pool, interaction, "Something went wrong!");  
+      await errorMessage(interaction, "Something went wrong!");  
     }
   } catch (e) {
     console.error({
@@ -162,3 +210,8 @@ export const DB_COMMANDS = {
   addSuggestion,
   fetchSuggestion
 };
+
+export const KNEX = {
+  addBook: addBookKnex,
+  getBooksOfType,
+}

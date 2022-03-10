@@ -12,7 +12,7 @@ export const suggest = async (interaction: CommandInteraction) => {
 
     const suggestion = interaction.options.getString(suggest.OPTIONS.suggestion, true);
     if(!suggestion){
-      await errorMessage(pool, interaction, "I need a suggestion!");
+      await errorMessage(interaction, "I need a suggestion!");
       return;  
     }
       
