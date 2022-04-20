@@ -1,7 +1,8 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, Guild } from "discord.js";
 import knex, { Knex } from "knex";
+import { random } from "lodash";
 import { Pool, PoolClient } from "pg";
-import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS } from "../dbConstants/dbConstants";
+import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS, GUILD } from "../dbConstants/dbConstants";
 import { errorMessage } from "./errorMessage";
 
 const convertTypeToSmallInt = (bookType: BOOK_TYPES) => {
@@ -15,6 +16,11 @@ const convertTypeToSmallInt = (bookType: BOOK_TYPES) => {
   return type;
 };
 
+
+const randomSelection = <T>(arr: Array<T>) => {
+  const index = Math.floor(Math.random() * arr.length);
+  return arr[index];
+}
 
 const connectToClient = async () => {
   const {
@@ -65,153 +71,171 @@ const knexConnect = async () => {
   return connection;
 };
 
-const getBooksOfType = async (guildId, bookType: BOOK_TYPES): Promise<BOOK[]> => {
+const getRandomBookOfType = async (guildId, bookType: BOOK_TYPES): Promise<BOOK> => {
   const {
     TABLE,
+    ID,
     GUILD_ID,
-    SUGGESTION_TYPE
+    BOOK_TYPE
   } = DB_CONSTANTS.BOOKS;
     
-  return (await knexConnect())<BOOK>(TABLE)
+  const bookIds = await (await knexConnect())<BOOK>(TABLE)
+    .select("id")
+    .whereIn(GUILD_ID, [guildId, null])
+    .andWhere(BOOK_TYPE, convertTypeToSmallInt(bookType));
+    console.log(bookIds);
+    const { id } = randomSelection(bookIds);
+    console.log(id);
+    return (await knexConnect())<BOOK>(TABLE)
     .select("*")
-    .where(SUGGESTION_TYPE, convertTypeToSmallInt(bookType))
-    .andWhere(GUILD_ID, [guildId, null])
+    .where(ID, id)
+    .first();
 } 
 
-
-const getRandomBook = async (pool: PoolClient, guildId: string, bookType: BOOK_TYPES): Promise<BOOK[]> => {
-  const {
-    TABLE,
-    GUILD_ID,
-    SUGGESTION_TYPE
-  } = DB_CONSTANTS.BOOKS;
-    
-  const books = await pool.query(`
-        SELECT *
-        FROM ${TABLE}
-        WHERE ${SUGGESTION_TYPE} = $1 and (${GUILD_ID} = $2 or ${GUILD_ID} = NULL)
-    `, [convertTypeToSmallInt(bookType), guildId]);
-
-  return books.rows as BOOK[];
-};
-
-const addBookKnex = async(connection: Knex, guildId: string, title: string, bookType: BOOK_TYPES) => {
+const addBook = async(guildId: string, title: string, bookType: BOOK_TYPES) => {
   const {
     TABLE,
   } = DB_CONSTANTS.BOOKS;
     
   const books = await (await knexConnect())<BOOK>(TABLE)
-  .insert({title: title, guild_id: guildId, suggestion_type: convertTypeToSmallInt(bookType)})
+  .insert({title: title, guild_id: guildId, book_type: convertTypeToSmallInt(bookType)})
 
   return books;
 }
 
-const addBook = async (pool: PoolClient, guildId: string, title: string, bookType: BOOK_TYPES) => {
+const getBook = async(guildId: string, id: number) => {
+    const {
+      TABLE,
+      ID,
+      GUILD_ID
+    } = DB_CONSTANTS.BOOKS;
+      
+    const books = await (await knexConnect())<BOOK>(TABLE)
+    .select("*")
+    .where(ID, id)
+    .andWhere(GUILD_ID, guildId)
+    .first()
     
+    return books;
+  }
+
+const addSuggestion = async (guildId:string, suggestion: string, userId: string) => {
+    const {
+        TABLE
+    } = DB_CONSTANTS.PROMPTS;
+
+    const prompt = (await knexConnect())<PROMPT_TYPE>(TABLE)
+        .insert({guild_id: guildId, prompt: suggestion, user_id: userId});
+
+    return prompt
+}
+
+const fetchSuggestion = async (guildId: string) => {
   const {
     TABLE,
-    TITLE,
-    GUILD_ID,
-    SUGGESTION_TYPE
-  } = DB_CONSTANTS.BOOKS;
-    
-  const books = await pool.query(`
-        INSERT INTO ${TABLE} (${GUILD_ID}, ${TITLE}, ${SUGGESTION_TYPE})
-        VALUES ($1, $2, $3);
-    `, [guildId, title, convertTypeToSmallInt(bookType)]);
-
-  return books.rows as BOOK[];
-};
-
-const addSuggestion = async (pool: PoolClient, guildId: string, suggestion: string) => {
-    
-  const {
-    TABLE,
-    GUILD_ID,
-    PROMPT
-  } = DB_CONSTANTS.PROMPTS;
-    
-  const suggestions = await pool.query(`
-        INSERT INTO ${TABLE} (${GUILD_ID}, ${PROMPT})
-        VALUES ($1, $2);
-    `, [guildId, suggestion]);
-
-  return suggestions.rows as PROMPT_TYPE[];
-};
-
-const fetchSuggestion = async (pool: PoolClient, guildId: string) => {
-  const {
-    TABLE,
+    ID,
     GUILD_ID,
   } = DB_CONSTANTS.PROMPTS;
     
-  const suggestions = await pool.query(`
-        SELECT * from ${TABLE}
-        WHERE ${GUILD_ID} = $1
-        ORDER BY RANDOM()
-    `, [guildId]);
+  const suggestionIds = await (await knexConnect())<PROMPT_TYPE>(TABLE)
+    .select('id')
+    .where(GUILD_ID, guildId)
 
-  return suggestions.rows as PROMPT_TYPE[];
+  const { id } = randomSelection(suggestionIds);
+
+  const suggestions = await (await knexConnect())<PROMPT_TYPE>(TABLE)
+    .select("*")
+    .where(ID, id);
+
+  return suggestions;
 };
 
-const deleteBook = async (pool: PoolClient, guildId: string, title: string, bookType: BOOK_TYPES) => {
+
+const getSuggestion = async (guildId: string, id: number) => {
+    const {
+      TABLE,
+      ID,
+      GUILD_ID,
+    } = DB_CONSTANTS.PROMPTS;
+      
+    const suggestions = await (await knexConnect())<PROMPT_TYPE>(TABLE)
+      .select('*')
+      .where(GUILD_ID, guildId)
+      .andWhere(ID, id)
+      .first();
+  
+    return suggestions;
+  };
+
+const deleteSuggestion = async (guildId: string, id: number) => {
+    const {
+        TABLE,
+        GUILD_ID,
+        ID,
+    } = DB_CONSTANTS.PROMPTS;
+
+    const suggestions = await (await knexConnect())<PROMPT_TYPE>(TABLE)
+    .where(GUILD_ID, guildId)
+    .andWhere(ID, id)
+    .del();
+
+    return suggestions;
+}
+
+const editSuggestion = async (guildId: string, id: number, suggestion: string) => {
+    const {
+        TABLE,
+        GUILD_ID,
+        ID,
+    } = DB_CONSTANTS.PROMPTS;
+
+    const suggestions = await (await knexConnect())<PROMPT_TYPE>(TABLE)
+    .where(GUILD_ID, guildId)
+    .andWhere(ID, id)
+    .update({prompt: suggestion});
+
+    return suggestions;
+}
+
+const deleteBook = async (guildId: string, title: string, type: BOOK_TYPES) => {
   const {
     TABLE,
     TITLE,
+    BOOK_TYPE,
     GUILD_ID,
-    SUGGESTION_TYPE
   } = DB_CONSTANTS.BOOKS;
     
-  const books = await pool.query<BOOK>(`
-        DELETE FROM ${TABLE}
-        WHERE ${GUILD_ID} = $1 and ${TITLE} = $2 and ${SUGGESTION_TYPE} = $3 as book_type
-    `, [guildId, title, bookType]);
+  const books = await (await knexConnect())<BOOK>(TABLE)
+    .where(GUILD_ID, guildId)
+    .andWhere(TITLE, title)
+    .andWhere(BOOK_TYPE, convertTypeToSmallInt(type))
+    .del();
 
   return books;
 };
 
-const registerGuild = async (pool: PoolClient, guildId: string, interaction: CommandInteraction) => {
+const registerGuild = async (guildId: string, interaction: CommandInteraction) => {
   const {
     TABLE,
-    GUILD_ID,
   } = DB_CONSTANTS.GUILD_DB;
 
-  try {
-    const result = await pool.query(`
-            INSERT INTO ${TABLE} (${GUILD_ID})
-            VALUES ($1);
-        `, [guildId]);
+    const guilds = await (await knexConnect())<GUILD>(TABLE)
+        .insert({guild_id: guildId});
 
-    if(result.rowCount !== 1){
-      console.error({
-        result,
-        timestame: Date.now()
-      });
-      await errorMessage(interaction, "Something went wrong!");  
-    }
-  } catch (e) {
-    console.error({
-      e,
-      timestame: Date.now()
-    });
-    throw e;
-  }
+    return guilds;
 
-  return true;
-    
 };
+
 
 export const DB_COMMANDS = {
-  connectToClient,
-  getRandomBook,
   addBook,
+  getBook,
+  getRandomBookOfType,
+  addSuggestion,
+  getSuggestion,
+  deleteSuggestion,
   deleteBook,
   registerGuild,
-  addSuggestion,
-  fetchSuggestion
-};
-
-export const KNEX = {
-  addBook: addBookKnex,
-  getBooksOfType,
+  fetchSuggestion,
+  editSuggestion
 }

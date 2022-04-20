@@ -6,52 +6,52 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { BOOK_TYPES, BOOK_TYPE_ARGS } from "../dbConstants/dbConstants";
 
 
-export const addBook = async (interaction: CommandInteraction) => {
+export const deleteBook = async (interaction: CommandInteraction) => {
     if(!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_GUILD)){
       await errorMessage(interaction, "You do not have permissions for this command!");
       return;  
     }
 
-    const type = interaction.options.getString(addBook.OPTIONS.kind, true);
+    const type = interaction.options.getString(deleteBook.OPTIONS.kind, true);
 
     if(!BOOK_TYPE_ARGS.includes(type as BOOK_TYPES)){
       await errorMessage(interaction, `I don't know how to handle a type of ${type} `);
       return;  
     }
 
-    const title = interaction.options.getString(addBook.OPTIONS.title, true);
+    const title = interaction.options.getString(deleteBook.OPTIONS.title, true);
     if(!title){
       await errorMessage(interaction, "I need a title!");
       return;  
     }
       
-    await DB_COMMANDS.addBook(
+    await DB_COMMANDS.deleteBook(
       interaction.guildId, 
       title,
       type as BOOK_TYPES
     );
 
-    await interaction.reply(`I have added ${title} to my repitoire!`);
+    await interaction.reply(`I have removed ${title} from my repitoire!`);
   
 };
 
 
-addBook.OPTIONS = {
+deleteBook.OPTIONS = {
   title: "title",
   kind: "kind"
 };
 
-addBook.COMMAND_NAME = "addbook";
-addBook.COMMAND =  new SlashCommandBuilder()
-  .setName(addBook.COMMAND_NAME)
-  .setDescription("Add a book to the error message responses")
+deleteBook.COMMAND_NAME = "deletebook";
+deleteBook.COMMAND =  new SlashCommandBuilder()
+  .setName(deleteBook.COMMAND_NAME)
+  .setDescription("The title of the book to remove")
   .addStringOption(option => option
-    .setName(addBook.OPTIONS.title)
-    .setDescription("The book you wish to add to the bot list list")
+    .setName(deleteBook.OPTIONS.title)
+    .setDescription("The book you wish to remove from the bot list list. This has to be an exact match.")
     .setRequired(true)
   )
   .addStringOption(option => option
-    .setName(addBook.OPTIONS.kind)
+    .setName(deleteBook.OPTIONS.kind)
     .addChoice("book", "book")
     .addChoice("fanfic", "fanfic")
     .addChoice("meme", "meme")

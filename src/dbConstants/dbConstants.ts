@@ -9,17 +9,21 @@ export const DB_CONSTANTS = {
     ID: "id",
     GUILD_ID: "guild_id",
     TITLE: "title",
-    SUGGESTION_TYPE: "SUGGESTION_TYPE"
+    BOOK_TYPE: "book_type"
   },
   PROMPTS: {
     TABLE: "prompts",
     ID: "id",
     GUILD_ID: "guild_id",
-    PROMPT: "prompt" 
+    USER_ID: "user_id", 
+    PROMPT: "prompt", 
   }
 };
 
-
+export type GUILD = {
+    id: number,
+    guild_id: string,
+}
 
 export type BOOK_TYPES = "book" | "fanfic" | "meme";
 export const BOOK_TYPE_ARGS: BOOK_TYPES[] = ["book", "fanfic", "meme"];
@@ -27,11 +31,13 @@ export type BOOK = {
     id: number;
     guild_id: string;
     title: string;
-    suggestion_type: number;
+    book_type: number;
 }
 
 export type PROMPT = {
     id: number;
     guild_id: string;
     prompt: string;
+    user_id: string;
 }
+

@@ -2,18 +2,12 @@
 import { CommandInteraction } from "discord.js";
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
-import { SlashCommandBuilder, quote, } from "@discordjs/builders";
+import { SlashCommandBuilder, quote, inlineCode } from "@discordjs/builders";
 
 
 export const prompt = async (interaction: CommandInteraction) => {
-
-  
-
-  const pool = await DB_COMMANDS.connectToClient();
-  try {
       
-    const result = await DB_COMMANDS.fetchSuggestion(
-      pool, 
+    const result = await DB_COMMANDS.fetchSuggestion( 
       interaction.guildId, 
     );
 
@@ -22,11 +16,11 @@ export const prompt = async (interaction: CommandInteraction) => {
       return;
     }
 
-
-    await interaction.reply(`May I suggest? \n ${quote(result[0].prompt)}`);
-  } finally {
-    pool.release();
-  }
+    const {
+        id, 
+        prompt
+    } = result[0];
+    await interaction.reply(`May I suggest the following? \nSuggestion #${inlineCode(id.toString())}:\n\n${quote(prompt)}\nYou're welcome.`);
 };
 
 

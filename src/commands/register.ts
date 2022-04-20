@@ -5,16 +5,15 @@ import { DB_COMMANDS } from "../utils/postgresConnections";
 import { SlashCommandBuilder } from "@discordjs/builders";
 
 export const register = async (interaction: CommandInteraction) => {
-  const pool = await DB_COMMANDS.connectToClient();
-  try {
-    await DB_COMMANDS.registerGuild(pool, interaction.guildId, interaction);
-  } catch(e) {
-    console.log(e); 
-    await errorMessage(interaction, "Something went wrong registering your server!");
-    return;
-  } finally {
-    pool.release();
-  }
+  
+	try {
+    	await DB_COMMANDS.registerGuild(interaction.guildId, interaction);
+
+		interaction.reply(`I have succesfully registered your server!`);
+	} catch {
+		errorMessage(interaction, 'Something went wrong!');
+	}
+
 };
 
 register.COMMAND_NAME = "register";

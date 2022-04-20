@@ -8,6 +8,9 @@ import { register } from "./commands/register";
 import { addBook } from "./commands/addBook";
 import { prompt } from "./commands/prompt";
 import { suggest } from "./commands/suggest";
+import { deletePrompt } from "./commands/deletePrompt";
+import { deleteBook } from "./commands/deleteBook";
+import { editPrompt } from "./commands/editprompt";
 
 dotenv.config({path:__dirname+"/.env"});
 
@@ -46,6 +49,10 @@ client.on("interactionCreate", async interaction => {
     await addBook(interaction);
     break;
   }
+  case deleteBook.COMMAND_NAME: {
+      await deleteBook(interaction);
+      break;
+  }
   case prompt.COMMAND_NAME: {
     await prompt(interaction);
     break;
@@ -53,6 +60,14 @@ client.on("interactionCreate", async interaction => {
   case suggest.COMMAND_NAME: {
     await suggest(interaction);
     break;
+  }
+  case deletePrompt.COMMAND_NAME: {
+      await deletePrompt(interaction);
+      break;
+  }
+  case editPrompt.COMMAND_NAME: {
+      await editPrompt(interaction);
+      break;
   }
   default: {
     await errorMessage(interaction, `I failed to understand what you meant by ${command}`);

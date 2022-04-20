@@ -7,25 +7,20 @@ import { SlashCommandBuilder, quote } from "@discordjs/builders";
 
 export const suggest = async (interaction: CommandInteraction) => {
 
-  const pool = await DB_COMMANDS.connectToClient();
-  try {
-
     const suggestion = interaction.options.getString(suggest.OPTIONS.suggestion, true);
     if(!suggestion){
       await errorMessage(interaction, "I need a suggestion!");
       return;  
     }
       
-    await DB_COMMANDS.addSuggestion(
-      pool, 
+    const result = await DB_COMMANDS.addSuggestion( 
       interaction.guildId, 
-      suggestion
+      suggestion,
+      interaction.member.user.id
     );
 
-    await interaction.reply(`${quote(suggestion)} \n That's an excellent suggestion!`);
-  } finally {
-    pool.release();
-  }
+    await interaction.reply(`${quote(suggestion)} \n\nThat's an excellent suggestion! I'll add it to the list`);
+  
 };
 
 

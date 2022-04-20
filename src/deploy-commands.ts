@@ -7,6 +7,9 @@ import { register } from "./commands/register";
 import { addBook } from "./commands/addBook";
 import { suggest } from "./commands/suggest";
 import { prompt } from "./commands/prompt";
+import { deleteBook } from "./commands/deleteBook";
+import { deletePrompt } from "./commands/deletePrompt";
+import { editPrompt } from "./commands/editprompt";
 
 
 const { parsed:env } = dotenv.config({path:__dirname+"/.env"});
@@ -18,8 +21,11 @@ const commands = [
   fetch.COMMAND,
   register.COMMAND,
   addBook.COMMAND,
+  deleteBook.COMMAND,
   suggest.COMMAND,
   prompt.COMMAND,
+  deletePrompt.COMMAND,
+  editPrompt.COMMAND,
 ];
 
 const rest = new REST({version: "9"}).setToken(env.DISCORD_BOT_TOKEN);
