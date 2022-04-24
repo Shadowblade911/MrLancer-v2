@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  lancer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    environment:
+      - NODE_ENV=production
+      - DISCORD_BOT_TOKEN
+      - DISCORD_CLIENT_ID
+      - PGUSER
+      - PGHOST
+      - PGPORT
+      - PGPASSWORD
+      - PGDATABASE
+    command: npm run prod
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_USERR=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - POSTGRES_DB=${PGDATABASE}
