@@ -12,9 +12,7 @@ import { deletePrompt } from "./commands/deletePrompt";
 import { editPrompt } from "./commands/editprompt";
 
 
-const { parsed:env } = dotenv.config({path:__dirname+"/.env"});
-
-console.log(env);
+dotenv.config({path:__dirname+"/.env"});
 
 const commands = [
   oldMan.COMMAND,
@@ -28,13 +26,13 @@ const commands = [
   editPrompt.COMMAND,
 ];
 
-const rest = new REST({version: "9"}).setToken(env.DISCORD_BOT_TOKEN);
+const rest = new REST({version: "9"}).setToken(process.env.DISCORD_BOT_TOKEN);
 const clientId = process.env.DISCORD_CLIENT_ID;
 
 let apiCall;
-if(env.TEST_GUILD_ID){
+if(process.env.TEST_GUILD_ID){
   console.log("Attempting to register commands in test enviornment");
-  apiCall = Routes.applicationGuildCommands(clientId, env.TEST_GUILD_ID);
+  apiCall = Routes.applicationGuildCommands(clientId, process.env.TEST_GUILD_ID);
 } else {
   console.log("Attempting to register commands globally");
   apiCall = Routes.applicationCommands(clientId);
@@ -42,7 +40,7 @@ if(env.TEST_GUILD_ID){
 
 rest.put(apiCall, {body: commands.map(command => command.toJSON())})
   .then(() => {
-    if(env.TEST_GUILD_ID){
+    if(process.env.TEST_GUILD_ID){
       console.log("Succesfully registered application commands to test enviornment");
     } else {
       console.log("Succesfully registered application commands globally");
