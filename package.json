@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "prod": "node dist/index.js",
+    "dev": "knex migrate:latest && ts-node src/deploy-commands.ts && nodemon src/index.ts",
     "register-local": "tsc && cp .env.local ./dist/.env && node dist/deploy-commands.js",
     "start-local": "tsc && cp .env.local ./dist/.env && node dist/index.js",
     "start-prod": "tsc && cp .env ./dist/.env && node dist/index.js",
