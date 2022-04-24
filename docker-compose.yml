@@ -17,8 +17,8 @@ services:
       - DISCORD_CLIENT_ID
       - TEST_GUILD_ID
       - PGUSER
-      - PGHOST
-      - PGPORT
+      - PGHOST=postgres
+      - PGPORT=5432
       - PGPASSWORD
       - PGDATABASE
     command: npm run dev
@@ -30,5 +30,7 @@ services:
       - POSTGRES_DB=${PGDATABASE}
   adminer:
     image: adminer
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
     ports:
       - 8080:8080

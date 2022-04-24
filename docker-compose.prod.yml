@@ -11,8 +11,8 @@ services:
       - DISCORD_BOT_TOKEN
       - DISCORD_CLIENT_ID
       - PGUSER
-      - PGHOST
-      - PGPORT
+      - PGHOST=postgres
+      - PGPORT=5432
       - PGPASSWORD
       - PGDATABASE
     command: npm run prod
