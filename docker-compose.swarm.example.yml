@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  lancer:
+    image: 127.0.0.1:5000/stackdemo
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    environment:
+      - NODE_ENV=production
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGDATABASE=lancer
+    secrets:
+      - source: lancer-config
+        target: /app/dist/src/.env
+      - source: lancer-config
+        target: /app/.env
+    command: npm run prod
+  postgres:
+    image: docker.io/postgres:14
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password
+      - POSTGRES_DB=lancer
+    secrets:
+      - postgres-password
+  adminer:
+    image: docker.io/adminer:4
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+    ports:
+      - 8080:8080
+
+secrets:
+  lancer-config:
+    file: .env.stack
+  postgres-password:
+    external: true

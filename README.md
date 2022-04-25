@@ -21,3 +21,7 @@ to start MrLancer in development mode.
 
 In development mode the adminer database UI will be available at
 http://localhost:8080.
+
+## Deploying with Docker Swarm
+
+An example compose to use with Swarm is available in `docker-compose.swarm.example.yml`.
