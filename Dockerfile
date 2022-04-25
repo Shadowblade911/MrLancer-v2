@@ -1,4 +1,4 @@
-FROM node:16 as base
+FROM docker.io/node:16 as base
 
 WORKDIR /app
 COPY package*.json .

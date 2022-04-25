@@ -17,7 +17,7 @@ services:
       - PGDATABASE
     command: npm run prod
   postgres:
-    image: postgres:14
+    image: docker.io/postgres:14
     environment:
       - POSTGRES_USERR=${PGUSER}
       - POSTGRES_PASSWORD=${PGPASSWORD}

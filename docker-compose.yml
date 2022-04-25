@@ -23,13 +23,13 @@ services:
       - PGDATABASE
     command: npm run dev
   postgres:
-    image: postgres:14
+    image: docker.io/postgres:14
     environment:
       - POSTGRES_USERR=${PGUSER}
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
   adminer:
-    image: adminer
+    image: docker.io/adminer:4
     environment:
       - ADMINER_DEFAULT_SERVER=postgres
     ports:
