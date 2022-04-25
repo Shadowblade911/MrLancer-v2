@@ -25,7 +25,7 @@ services:
   postgres:
     image: docker.io/postgres:14
     environment:
-      - POSTGRES_USERR=${PGUSER}
+      - POSTGRES_USER=${PGUSER}
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
   adminer:
