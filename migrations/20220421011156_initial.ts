@@ -60,9 +60,8 @@ export async function up(knex: Knex): Promise<void> {
         table.smallint(DB_CONSTANTS.BOOKS.BOOK_TYPE).notNullable();
     })
 
-    knex.schema.createTable(DB_CONSTANTS.PROMPTS.TABLE, function(table){
+    await knex.schema.createTable(DB_CONSTANTS.PROMPTS.TABLE, function(table){
         table.increments();
-        table.string(DB_CONSTANTS.PROMPTS.GUILD_ID);
         table.string(DB_CONSTANTS.PROMPTS.GUILD_ID)
             .references(DB_CONSTANTS.GUILD_DB.GUILD_ID)
             .inTable(DB_CONSTANTS.GUILD_DB.TABLE).notNullable();

@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "prod": "knex migrate:latest && node dist/src/deploy-commands.js && node dist/src/index.js",
+    "dev": "knex migrate:latest && ts-node src/deploy-commands.ts && nodemon src/index.ts",
     "register-local": "tsc && cp .env.local ./dist/.env && node dist/deploy-commands.js",
     "start-local": "tsc && cp .env.local ./dist/.env && node dist/index.js",
     "start-prod": "tsc && cp .env ./dist/.env && node dist/index.js",
@@ -19,6 +22,7 @@
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "eslint": "^8.10.0",
+    "nodemon": "^2.0.15",
     "ts-node": "^10.7.0",
     "typescript": "^4.5.5"
   },

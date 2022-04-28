@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  lancer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/app/src
+      - ./nodemon.json:/app/nodemon.json
+      - ./migrations:/app/migrations
+      - ./knexfile.ts:/app/knexfile.ts
+    environment:
+      - NODE_ENV=local
+      - DISCORD_BOT_TOKEN
+      - DISCORD_CLIENT_ID
+      - TEST_GUILD_ID
+      - PGUSER
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGPASSWORD
+      - PGDATABASE
+    command: npm run dev
+  postgres:
+    image: docker.io/postgres:14
+    environment:
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - POSTGRES_DB=${PGDATABASE}
+  adminer:
+    image: docker.io/adminer:4
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+    ports:
+      - 8080:8080

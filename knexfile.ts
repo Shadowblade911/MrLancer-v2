@@ -2,22 +2,16 @@ import type { Knex } from "knex";
 import dotenv from 'dotenv';
 import path from 'path';
 
-let env;
 switch(process.env.NODE_ENV){
   case 'local':
-    env = dotenv.config({ path: path.resolve(__dirname,'.env.local')})
+    dotenv.config({ path: path.resolve(__dirname,'.env.local')})
     break;
   case 'production':
-    env = dotenv.config({ path: path.resolve(__dirname, '.env')})
+    dotenv.config({ path: path.resolve(__dirname, '.env')})
     break;
   default: 
-   throw Error("unable to determine ENV, pass in NODE_ENV before running the migrate commands");
+    throw Error("unable to determine ENV, pass in NODE_ENV before running the migrate commands");
 }
-
- dotenv.config();
-// Update with your config settings.
-
-console.log(env);
 
 const config: { [key: string]: Knex.Config } = {
   [process.env.NODE_ENV]: {
