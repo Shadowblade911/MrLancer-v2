@@ -15,6 +15,7 @@ services:
       - PGPORT=5432
       - PGPASSWORD
       - PGDATABASE
+    restart: on-failure:5
     command: npm run prod
   postgres:
     image: docker.io/postgres:14
