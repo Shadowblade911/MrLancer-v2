@@ -2,11 +2,7 @@ version: '3.7'
 
 services:
   lancer:
-    image: 127.0.0.1:5000/lancer
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: prod
+    image: docker.io/jcotton42/lancerbot:v2
     environment:
       - NODE_ENV=production
       - PGUSER=postgres
