@@ -4,6 +4,8 @@ Fill me in
 
 ## Running with Docker
 
+A docker image is available at `docker.io/jcotton42/mrlancer`.
+
 To run this bot populate the environment variables listed in `sample.env` either
 in a `.env` file or through some other mechanism. Then run:
 
