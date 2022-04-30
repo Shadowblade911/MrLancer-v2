@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   lancer:
-    image: docker.io/jcotton42/lancerbot:v2
+    image: docker.io/jcotton42/mrlancer:v1
     environment:
       - PGUSER=postgres
       - PGHOST=postgres
@@ -10,7 +10,7 @@ services:
       - PGDATABASE=lancer
     secrets:
       - source: lancer-config
-        target: /app/dist/src/.env
+        target: /app/src/.env
       - source: lancer-config
         target: /app/.env
     init: true
