@@ -12,7 +12,6 @@ services:
       - ./migrations:/app/migrations
       - ./knexfile.ts:/app/knexfile.ts
     environment:
-      - NODE_ENV=local
       - DISCORD_BOT_TOKEN
       - DISCORD_CLIENT_ID
       - TEST_GUILD_ID
@@ -21,7 +20,8 @@ services:
       - PGPORT=5432
       - PGPASSWORD
       - PGDATABASE
-    command: npm run dev
+    restart: on-failure:5
+    init: true
   postgres:
     image: docker.io/postgres:14
     environment:

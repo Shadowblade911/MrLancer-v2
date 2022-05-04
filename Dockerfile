@@ -1,17 +1,35 @@
 FROM docker.io/node:16 as base
 
-RUN mkdir /app
-RUN chown node:node /app
+ENV NODE_ENV=local
+RUN mkdir /app && chown node:node /app
 
 USER node
 
 WORKDIR /app
 COPY --chown=node:node package*.json .
-RUN npm install
+RUN npm ci && npm cache clean --force
 COPY --chown=node:node . .
 
-FROM base as prod
+CMD npx knex migrate:latest \
+    && npx ts-node src/deploy-commands.ts \
+    && exec npx nodemon src/index.ts
+
+FROM base as build
 
 RUN npm run build
 
-CMD ["npm", "run", "prod"]
+FROM docker.io/node:16-slim as prod
+
+ENV NODE_ENV=production
+RUN mkdir /app && chown node:node /app
+
+USER node
+
+WORKDIR /app
+COPY --chown=node:node package*.json .
+RUN npm ci && npm cache clean --force
+COPY --chown=node:node --from=build /app/dist/ .
+
+CMD npx knex migrate:latest \
+    && node src/deploy-commands.js \
+    && exec node src/index.js

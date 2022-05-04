@@ -2,23 +2,18 @@ version: '3.7'
 
 services:
   lancer:
-    image: 127.0.0.1:5000/lancer
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: prod
+    image: docker.io/jcotton42/mrlancer:v1
     environment:
-      - NODE_ENV=production
       - PGUSER=postgres
       - PGHOST=postgres
       - PGPORT=5432
       - PGDATABASE=lancer
     secrets:
       - source: lancer-config
-        target: /app/dist/src/.env
+        target: /app/src/.env
       - source: lancer-config
         target: /app/.env
-    command: npm run prod
+    init: true
   postgres:
     image: docker.io/postgres:14
     environment:

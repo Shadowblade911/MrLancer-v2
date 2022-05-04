@@ -7,7 +7,6 @@ services:
       dockerfile: Dockerfile
       target: prod
     environment:
-      - NODE_ENV=production
       - DISCORD_BOT_TOKEN
       - DISCORD_CLIENT_ID
       - PGUSER
@@ -15,7 +14,8 @@ services:
       - PGPORT=5432
       - PGPASSWORD
       - PGDATABASE
-    command: npm run prod
+    restart: on-failure:5
+    init: true
   postgres:
     image: docker.io/postgres:14
     environment:
