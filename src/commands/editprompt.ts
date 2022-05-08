@@ -17,7 +17,7 @@ export const editPrompt = async (interaction: CommandInteraction) => {
     const prompt = await DB_COMMANDS.getSuggestion(guildId, id);
   
     if(!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_GUILD) && memberId !== prompt.user_id){
-      await errorMessage(interaction, "You are not allowed to delete this prompt. Ask a mod or the original creator.");
+      await errorMessage(interaction, "You are not allowed to edit this prompt. Ask a mod or the original creator.");
       return;  
     }
 
@@ -40,10 +40,10 @@ editPrompt.OPTIONS = {
 editPrompt.COMMAND_NAME = "editprompt";
 editPrompt.COMMAND =  new SlashCommandBuilder()
   .setName(editPrompt.COMMAND_NAME)
-  .setDescription("Deletes a suggested prompt")
+  .setDescription("Edits a suggested prompt")
   .addNumberOption(option => option
     .setName(editPrompt.OPTIONS.id)
-    .setDescription("The prompt you wish to remove from the list")
+    .setDescription("The prompt you wish to edit")
     .setRequired(true)
   )
   .addStringOption(option => option
