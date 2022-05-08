@@ -23,6 +23,10 @@ const client = new DiscordClient({
   intents
 });
 
+process
+  .on('SIGTERM', shutdown)
+  .on('SIGINT', shutdown);
+
 client.login(process.env.DISCORD_BOT_TOKEN);
 
 client.once("ready", () => {
@@ -85,3 +89,8 @@ client.on("interactionCreate", async interaction => {
   }
 
 });
+
+function shutdown(signal: NodeJS.Signals) {
+  client.destroy();
+  console.info(`lancer received ${signal}, shutting down.`);
+}
