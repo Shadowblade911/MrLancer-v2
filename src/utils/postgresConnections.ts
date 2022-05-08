@@ -145,13 +145,15 @@ const fetchSuggestion = async (guildId: string) => {
     .select('id')
     .where(GUILD_ID, guildId)
 
-  const { id } = randomSelection(suggestionIds);
+  const selection = randomSelection(suggestionIds);
 
-  const suggestions = await (await knexConnect())<PROMPT_TYPE>(TABLE)
-    .select("*")
-    .where(ID, id);
-
-  return suggestions;
+  if(selection) {
+    return await (await knexConnect())<PROMPT_TYPE>(TABLE)
+      .select("*")
+      .where(ID, selection.id);
+  } else {
+    return null;
+  }
 };
 
 
