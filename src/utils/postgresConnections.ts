@@ -84,12 +84,16 @@ const getRandomBookOfType = async (guildId, bookType: BOOK_TYPES): Promise<BOOK>
     .whereIn(GUILD_ID, [guildId, null])
     .andWhere(BOOK_TYPE, convertTypeToSmallInt(bookType));
  
-    const { id } = randomSelection(bookIds);
-  
+  const selection = randomSelection(bookIds);
+
+  if(selection) {
     return (await knexConnect())<BOOK>(TABLE)
-    .select("*")
-    .where(ID, id)
-    .first();
+      .select("*")
+      .where(ID, selection.id)
+      .first();
+  } else {
+    return null;
+  }
 } 
 
 const addBook = async(guildId: string, title: string, bookType: BOOK_TYPES) => {
