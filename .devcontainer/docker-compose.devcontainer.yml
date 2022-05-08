@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  lancer:
+    build:
+      target: devenv
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity

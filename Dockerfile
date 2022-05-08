@@ -1,3 +1,7 @@
+FROM docker.io/node:16 as devenv
+
+ENV NODE_ENV=local
+
 FROM docker.io/node:16 as base
 
 ENV NODE_ENV=local
