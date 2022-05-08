@@ -15,6 +15,11 @@ export const editPrompt = async (interaction: CommandInteraction) => {
     const suggestion = interaction.options.getString(editPrompt.OPTIONS.suggestion, true);
 
     const prompt = await DB_COMMANDS.getSuggestion(guildId, id);
+
+    if(!prompt) {
+      await errorMessage(interaction, "That prompt does not exist.");
+      return;
+    }
   
     if(!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_GUILD) && memberId !== prompt.user_id){
       await errorMessage(interaction, "You are not allowed to edit this prompt. Ask a mod or the original creator.");
