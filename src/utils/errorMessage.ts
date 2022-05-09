@@ -14,9 +14,9 @@ export const errorMessage = async (userInteraction: CommandInteraction, error: s
   } else {
     book = await DB_COMMANDS.getRandomBookOfType(userInteraction.guildId,  "book");
   }
-  console.log(book);
+  
   const title = book ? book.title : "Just Fourteen";
 
-  userInteraction.reply(`${title}! ${error}`);
+  await userInteraction.reply(`${title}! ${error}`);
 
 };

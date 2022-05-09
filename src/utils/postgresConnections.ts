@@ -276,5 +276,7 @@ export const DB_COMMANDS = {
   registerGuild,
   fetchSuggestion,
   editSuggestion,
-  listElevatedMembers
+  listElevatedMembers,
+  registerElevatedMember,
+  revokeElevatedMember,
 }

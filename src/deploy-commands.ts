@@ -11,6 +11,7 @@ import { deleteBook } from "./commands/deleteBook";
 import { deletePrompt } from "./commands/deletePrompt";
 import { editPrompt } from "./commands/editprompt";
 import { addElevatedUser } from "./commands/addElevatedUser";
+import { removeElevatedUser } from "./commands/removeElevatedUser";
 
 
 dotenv.config({path:__dirname+"/.env"});
@@ -26,6 +27,7 @@ const commands = [
   deletePrompt.COMMAND,
   editPrompt.COMMAND,
   addElevatedUser.COMMAND,
+  removeElevatedUser.COMMAND,
 ];
 
 const rest = new REST({version: "9"}).setToken(process.env.DISCORD_BOT_TOKEN);
