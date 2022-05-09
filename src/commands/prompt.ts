@@ -1,11 +1,11 @@
 
-import { CommandInteraction, Interaction } from "discord.js";
+import { CommandInteraction, Interaction, TextChannel } from "discord.js";
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
 import { SlashCommandBuilder, quote, inlineCode, blockQuote } from "@discordjs/builders";
 
 
-export const prompt = async (interaction: CommandInteraction) => {
+export const prompt = async (interaction: CommandInteraction, followUp?: true) => {
       
     const result = await DB_COMMANDS.fetchSuggestion( 
       interaction.guildId, 
@@ -21,15 +21,19 @@ export const prompt = async (interaction: CommandInteraction) => {
         user_id,
         prompt
     } = result[0];
-
-    console.log("What...");
     
-    await interaction.reply({
+    const message = {
       content: `May I suggest the following by <@${user_id}>? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
       options: {
         allowedMentions: { users: [] }
       }
-    });
+    };
+
+    if(!followUp) {
+      await interaction.reply(message);
+    } else {
+      (await interaction.client.channels.fetch(interaction.channelId) as TextChannel).send(message)
+    }
     
 };
 
