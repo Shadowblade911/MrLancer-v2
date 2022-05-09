@@ -21,9 +21,11 @@ export const prompt = async (interaction: CommandInteraction, followUp?: true) =
         user_id,
         prompt
     } = result[0];
+
+    const creditLine = user_id ? ` by <@${user_id}>` : '';
     
     const message = {
-      content: `May I suggest the following by <@${user_id}>? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
+      content: `May I suggest the following${creditLine}? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
       options: {
         allowedMentions: { users: [] }
       }
@@ -31,7 +33,7 @@ export const prompt = async (interaction: CommandInteraction, followUp?: true) =
 
     if(!followUp) {
       const reply: InteractionReplyOptions = {
-        content: `May I suggest the following by <@${user_id}>? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
+        content: `May I suggest the following${creditLine}? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
         allowedMentions: {
           users: []
         }
