@@ -1,7 +1,7 @@
 import { CommandInteraction, Guild } from "discord.js";
 import knex, { Knex } from "knex";
 import { random } from "lodash";
-import { Pool, PoolClient } from "pg";
+import { DatabaseError, Pool, PoolClient } from "pg";
 import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS, GUILD, ELEVATED_USER } from "../dbConstants/dbConstants";
 import { errorMessage } from "./errorMessage";
 
@@ -225,10 +225,17 @@ const registerGuild = async (guildId: string) => {
     TABLE,
   } = DB_CONSTANTS.GUILD_DB;
 
-    const guilds = await (await knexConnect())<GUILD>(TABLE)
+    try {
+      await (await knexConnect())<GUILD>(TABLE)
         .insert({guild_id: guildId});
-
-    return guilds;
+      return true;
+    } catch(error) {
+      if(error instanceof DatabaseError && error.code == '23505') {
+        // 23505 is unique_violation in PostgreSQL https://www.postgresql.org/docs/current/errcodes-appendix.html
+        return false;
+      }
+      throw error;
+    }
 };
 
 const registerElevatedMember = async (guildId: string, userId: string, interaction: CommandInteraction) => {
