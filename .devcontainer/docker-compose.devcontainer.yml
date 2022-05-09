@@ -4,6 +4,7 @@ services:
   lancer:
     build:
       target: devenv
+    image: lancer-devenv
     volumes:
       - .:/workspace:cached
     command: sleep infinity
