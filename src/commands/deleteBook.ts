@@ -52,9 +52,10 @@ deleteBook.COMMAND =  new SlashCommandBuilder()
   )
   .addStringOption(option => option
     .setName(deleteBook.OPTIONS.kind)
-    .addChoice("book", "book")
-    .addChoice("fanfic", "fanfic")
-    .addChoice("meme", "meme")
+    .addChoices(
+        {name: "book", 'value': 'book'},
+        {name: "fanfic", 'value': 'fanfic'},
+        {name: "meme", 'value': 'meme'})
     .setDescription("What kind of literature is it?")
     .setRequired(true)
   );

@@ -4,10 +4,11 @@ import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BOOK_TYPES, BOOK_TYPE_ARGS } from "../dbConstants/dbConstants";
+import { allowsEdit } from "../utils/allowsEdit";
 
 
 export const addBook = async (interaction: CommandInteraction) => {
-    if(!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_GUILD)){
+    if(!await allowsEdit(interaction)){
       await errorMessage(interaction, "You do not have permissions for this command!");
       return;  
     }
@@ -52,9 +53,11 @@ addBook.COMMAND =  new SlashCommandBuilder()
   )
   .addStringOption(option => option
     .setName(addBook.OPTIONS.kind)
-    .addChoice("book", "book")
-    .addChoice("fanfic", "fanfic")
-    .addChoice("meme", "meme")
+    .addChoices(
+      {name: "book", 'value': 'book'},
+      {name: "fanfic", 'value': 'fanfic'},
+      {name: "meme", 'value': 'meme'}
+    )
     .setDescription("What kind of literature is it?")
     .setRequired(true)
   );

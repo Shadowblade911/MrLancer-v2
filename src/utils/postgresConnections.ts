@@ -2,7 +2,7 @@ import { CommandInteraction, Guild } from "discord.js";
 import knex, { Knex } from "knex";
 import { random } from "lodash";
 import { Pool, PoolClient } from "pg";
-import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS, GUILD } from "../dbConstants/dbConstants";
+import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS, GUILD, ELEVATED_USER } from "../dbConstants/dbConstants";
 import { errorMessage } from "./errorMessage";
 
 const convertTypeToSmallInt = (bookType: BOOK_TYPES) => {
@@ -223,7 +223,45 @@ const registerGuild = async (guildId: string, interaction: CommandInteraction) =
         .insert({guild_id: guildId});
 
     return guilds;
+};
 
+const registerElevatedMember = async (guildId: string, userId: string, interaction: CommandInteraction) => {
+  const {
+    TABLE,
+    GUILD_ID
+  } = DB_CONSTANTS.ELEVATED_USERS;
+
+    const users = await (await knexConnect())<ELEVATED_USER>(TABLE)
+        .insert({[GUILD_ID]: guildId, user_id: userId});
+
+    return users;
+};
+
+
+const revokeElevatedMember = async (guildId: string, userId: string, interaction: CommandInteraction) => {
+  const {
+    TABLE,
+    GUILD_ID,
+    USER_ID,
+  } = DB_CONSTANTS.ELEVATED_USERS;
+
+    const users = await (await knexConnect())<ELEVATED_USER>(TABLE)
+        .where({[GUILD_ID]: guildId, [USER_ID]: userId})
+        .delete();
+
+    return users;
+};
+
+const listElevatedMembers = async (guildId: string) => {
+  const {
+    TABLE,
+  } = DB_CONSTANTS.ELEVATED_USERS;
+
+    const users = await (await knexConnect())<ELEVATED_USER>(TABLE)
+      .select('*')
+      .where({guild_id: guildId});
+
+    return users;
 };
 
 
@@ -237,5 +275,6 @@ export const DB_COMMANDS = {
   deleteBook,
   registerGuild,
   fetchSuggestion,
-  editSuggestion
+  editSuggestion,
+  listElevatedMembers
 }

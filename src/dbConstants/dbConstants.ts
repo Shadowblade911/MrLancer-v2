@@ -17,6 +17,12 @@ export const DB_CONSTANTS = {
     GUILD_ID: "guild_id",
     USER_ID: "user_id", 
     PROMPT: "prompt", 
+  },
+  ELEVATED_USERS: {
+    TABLE: 'elevated_users',
+    ID: "id",
+    GUILD_ID: 'guild_id',
+    USER_ID: 'user_id',
   }
 };
 
@@ -41,3 +47,7 @@ export type PROMPT = {
     user_id: string;
 }
 
+export type ELEVATED_USER = {
+  guild_id: string;
+  user_id: string;
+}
