@@ -66,7 +66,7 @@ export async function up(knex: Knex): Promise<void> {
             .references(DB_CONSTANTS.GUILD_DB.GUILD_ID)
             .inTable(DB_CONSTANTS.GUILD_DB.TABLE).notNullable();
         table.string(DB_CONSTANTS.PROMPTS.USER_ID).notNullable();
-        table.string(DB_CONSTANTS.PROMPTS.PROMPT).notNullable();
+        table.text(DB_CONSTANTS.PROMPTS.PROMPT).notNullable();
     })
 }
 

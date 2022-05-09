@@ -10,8 +10,8 @@
     "start-prod": "tsc && cp .env ./dist/.env && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx eslint .",
-    "migrate-local": "export NODE_ENV=local && knex migrate:latest",
-    "migrate-prod": " export NODE_ENV=production && knex migrate:latest"
+    "migrate-local": "tsc && cp .env.local  ./dist/.env && cd ./dist && knex migrate:latest",
+    "migrate-prod": "tsc && cp .env  ./dist/.env && cd ./dist & knex migrate:latest"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +25,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "@discordjs/builders": "^0.12.0",
+    "@discordjs/builders": "^0.13.0",
     "@discordjs/rest": "^0.3.0",
     "@types/lodash": "^4.14.179",
     "@types/pg": "^8.6.4",

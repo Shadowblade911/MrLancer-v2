@@ -11,6 +11,7 @@ import { suggest } from "./commands/suggest";
 import { deletePrompt } from "./commands/deletePrompt";
 import { deleteBook } from "./commands/deleteBook";
 import { editPrompt } from "./commands/editprompt";
+import { addElevatedUser } from "./commands/addElevatedUser";
 
 dotenv.config({path:__dirname+"/.env"});
 
@@ -68,6 +69,10 @@ client.on("interactionCreate", async interaction => {
   case editPrompt.COMMAND_NAME: {
       await editPrompt(interaction);
       break;
+  }
+  case addElevatedUser.COMMAND_NAME: {
+    await addElevatedUser(interaction);
+    break;
   }
   default: {
     await errorMessage(interaction, `I failed to understand what you meant by ${command}`);

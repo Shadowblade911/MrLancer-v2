@@ -1,8 +1,8 @@
 
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, Interaction } from "discord.js";
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
-import { SlashCommandBuilder, quote, inlineCode } from "@discordjs/builders";
+import { SlashCommandBuilder, quote, inlineCode, blockQuote } from "@discordjs/builders";
 
 
 export const prompt = async (interaction: CommandInteraction) => {
@@ -18,9 +18,19 @@ export const prompt = async (interaction: CommandInteraction) => {
 
     const {
         id, 
+        user_id,
         prompt
     } = result[0];
-    await interaction.reply(`May I suggest the following? \nSuggestion #${inlineCode(id.toString())}:\n\n${quote(prompt)}\nYou're welcome.`);
+
+    console.log("What...");
+    
+    await interaction.reply({
+      content: `May I suggest the following by <@${user_id}>? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
+      options: {
+        allowedMentions: { users: [] }
+      }
+    });
+    
 };
 
 
