@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build-prod": "tsc --sourceMap false",
     "register-local": "tsc && cp .env.local ./dist/.env && node dist/deploy-commands.js",
     "start-local": "tsc && cp .env.local ./dist/.env && node dist/index.js",
     "start-prod": "tsc && cp .env ./dist/.env && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx eslint .",
-    "migrate-local": "tsc && cp .env.local  ./dist/.env && cd ./dist && knex migrate:latest",
-    "migrate-prod": "tsc && cp .env  ./dist/.env && cd ./dist & knex migrate:latest"
+    "migrate-local": "tsc && cp .env.local ./dist/.env && knex --cwd dist migrate:latest",
+    "migrate-prod": "tsc && cp .env ./dist/.env && knex --cwd dist migrate:latest"
   },
   "keywords": [],
   "author": "",
