@@ -17,7 +17,7 @@ import { removeElevatedUser } from "./commands/removeElevatedUser";
 dotenv.config({path:__dirname+"/.env"});
 
 const intents = new Intents();
-intents.add(Intents.FLAGS.GUILD_MESSAGES);
+intents.add(Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS);
 
 const client = new DiscordClient({
   intents
@@ -26,6 +26,11 @@ const client = new DiscordClient({
 process
   .on('SIGTERM', shutdown)
   .on('SIGINT', shutdown);
+
+client.on('guildCreate', async guild => {
+  await DB_COMMANDS.registerGuild(guild.id);
+  console.log(`Registered guild ${guild.id}`);
+});
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 

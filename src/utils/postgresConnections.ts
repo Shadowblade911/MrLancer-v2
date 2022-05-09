@@ -220,7 +220,7 @@ const deleteBook = async (guildId: string, title: string, type: BOOK_TYPES) => {
   return books;
 };
 
-const registerGuild = async (guildId: string, interaction: CommandInteraction) => {
+const registerGuild = async (guildId: string) => {
   const {
     TABLE,
   } = DB_CONSTANTS.GUILD_DB;
