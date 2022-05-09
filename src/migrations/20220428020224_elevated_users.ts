@@ -2,9 +2,9 @@ import { Knex } from "knex";
 
 const DB_CONSTANTS = {
     GUILD_DB: {
-      TABLE: "guilds",
-      ID: "id",
-      GUILD_ID: "guild_id",
+        TABLE: "guilds",
+        ID: "id",
+        GUILD_ID: "guild_id",
     },
     ELEVATED_USERS: {
         TABLE: 'elevated_users',

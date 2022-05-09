@@ -26,14 +26,17 @@ export const addBook = async (interaction: CommandInteraction) => {
       return;  
     }
       
-    await DB_COMMANDS.addBook(
+    const bookAdded = await DB_COMMANDS.addBook(
       interaction.guildId, 
       title,
       type as BOOK_TYPES
     );
 
-    await interaction.reply(`I have added ${title} to my repitoire!`);
-  
+    if(bookAdded) {
+      await interaction.reply(`I have added ${title} to my repitoire!`);
+    } else {
+      await errorMessage(interaction, "I've already got that book.");
+    }
 };
 
 

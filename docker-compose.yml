@@ -9,8 +9,6 @@ services:
     volumes:
       - ./src:/app/src
       - ./nodemon.json:/app/nodemon.json
-      - ./migrations:/app/migrations
-      - ./knexfile.ts:/app/knexfile.ts
     environment:
       - DISCORD_BOT_TOKEN
       - DISCORD_CLIENT_ID

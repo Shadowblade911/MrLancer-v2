@@ -2,7 +2,7 @@ import { CommandInteraction, Guild } from "discord.js";
 import knex, { Knex } from "knex";
 import { random } from "lodash";
 import { DatabaseError, Pool, PoolClient } from "pg";
-import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS, GUILD, ELEVATED_USER } from "../dbConstants/dbConstants";
+import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS, GUILD, ELEVATED_USER, POSTGRES_ERROR_CODES } from "../dbConstants/dbConstants";
 import { errorMessage } from "./errorMessage";
 
 const convertTypeToSmallInt = (bookType: BOOK_TYPES) => {
@@ -100,12 +100,18 @@ const addBook = async(guildId: string, title: string, bookType: BOOK_TYPES) => {
   const {
     TABLE,
   } = DB_CONSTANTS.BOOKS;
-    
-  const books = await (await knexConnect())<BOOK>(TABLE)
-  .insert({title: title, guild_id: guildId, book_type: convertTypeToSmallInt(bookType)})
 
-  return books;
-}
+  try {
+    await (await knexConnect())<BOOK>(TABLE)
+      .insert({title: title, guild_id: guildId, book_type: convertTypeToSmallInt(bookType)});
+    return true;
+  } catch(error) {
+    if(error instanceof DatabaseError && error.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION) {
+      return false;
+    }
+    throw error;
+  }
+};
 
 const getBook = async(guildId: string, id: number) => {
     const {
@@ -230,8 +236,7 @@ const registerGuild = async (guildId: string) => {
         .insert({guild_id: guildId});
       return true;
     } catch(error) {
-      if(error instanceof DatabaseError && error.code == '23505') {
-        // 23505 is unique_violation in PostgreSQL https://www.postgresql.org/docs/current/errcodes-appendix.html
+      if(error instanceof DatabaseError && error.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION) {
         return false;
       }
       throw error;
