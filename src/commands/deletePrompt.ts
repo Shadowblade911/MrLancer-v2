@@ -14,6 +14,11 @@ export const deletePrompt = async (interaction: CommandInteraction) => {
     const id = interaction.options.getNumber(deletePrompt.OPTIONS.id, true);
 
     const prompt = await DB_COMMANDS.getSuggestion(guildId, id);
+
+    if(!prompt) {
+      await errorMessage(interaction, "That prompt does not exist.");
+      return;
+    }
   
     if(!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_GUILD) && memberId !== prompt.user_id){
       await errorMessage(interaction, "You are not allowed to delete this prompt. Ask a mod or the original creator.");

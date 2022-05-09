@@ -25,13 +25,17 @@ export const deleteBook = async (interaction: CommandInteraction) => {
       return;  
     }
       
-    await DB_COMMANDS.deleteBook(
+    const booksDeleted = await DB_COMMANDS.deleteBook(
       interaction.guildId, 
       title,
       type as BOOK_TYPES
     );
 
-    await interaction.reply(`I have removed ${title} from my repitoire!`);
+    if(booksDeleted > 0) {
+      await interaction.reply(`I have removed ${title} from my repitoire!`);
+    } else {
+      await errorMessage(interaction, `${title} doesn't exist as a ${type}!`);
+    }
   
 };
 

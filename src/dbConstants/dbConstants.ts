@@ -26,6 +26,11 @@ export const DB_CONSTANTS = {
   }
 };
 
+// https://www.postgresql.org/docs/current/errcodes-appendix.html
+export const POSTGRES_ERROR_CODES = {
+  UNIQUE_VIOLATION: '23505',
+};
+
 export type GUILD = {
     id: number,
     guild_id: string,

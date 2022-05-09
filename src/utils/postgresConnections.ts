@@ -1,8 +1,8 @@
 import { CommandInteraction, Guild } from "discord.js";
 import knex, { Knex } from "knex";
 import { random } from "lodash";
-import { Pool, PoolClient } from "pg";
-import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS, GUILD, ELEVATED_USER } from "../dbConstants/dbConstants";
+import { DatabaseError, Pool, PoolClient } from "pg";
+import { BOOK, BOOK_TYPES, PROMPT as PROMPT_TYPE, DB_CONSTANTS, GUILD, ELEVATED_USER, POSTGRES_ERROR_CODES } from "../dbConstants/dbConstants";
 import { errorMessage } from "./errorMessage";
 
 const convertTypeToSmallInt = (bookType: BOOK_TYPES) => {
@@ -84,24 +84,34 @@ const getRandomBookOfType = async (guildId, bookType: BOOK_TYPES): Promise<BOOK>
     .whereIn(GUILD_ID, [guildId, null])
     .andWhere(BOOK_TYPE, convertTypeToSmallInt(bookType));
  
-    const { id } = randomSelection(bookIds);
-  
+  const selection = randomSelection(bookIds);
+
+  if(selection) {
     return (await knexConnect())<BOOK>(TABLE)
-    .select("*")
-    .where(ID, id)
-    .first();
+      .select("*")
+      .where(ID, selection.id)
+      .first();
+  } else {
+    return null;
+  }
 } 
 
 const addBook = async(guildId: string, title: string, bookType: BOOK_TYPES) => {
   const {
     TABLE,
   } = DB_CONSTANTS.BOOKS;
-    
-  const books = await (await knexConnect())<BOOK>(TABLE)
-  .insert({title: title, guild_id: guildId, book_type: convertTypeToSmallInt(bookType)})
 
-  return books;
-}
+  try {
+    await (await knexConnect())<BOOK>(TABLE)
+      .insert({title: title, guild_id: guildId, book_type: convertTypeToSmallInt(bookType)});
+    return true;
+  } catch(error) {
+    if(error instanceof DatabaseError && error.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION) {
+      return false;
+    }
+    throw error;
+  }
+};
 
 const getBook = async(guildId: string, id: number) => {
     const {
@@ -141,13 +151,15 @@ const fetchSuggestion = async (guildId: string) => {
     .select('id')
     .where(GUILD_ID, guildId)
 
-  const { id } = randomSelection(suggestionIds);
+  const selection = randomSelection(suggestionIds);
 
-  const suggestions = await (await knexConnect())<PROMPT_TYPE>(TABLE)
-    .select("*")
-    .where(ID, id);
-
-  return suggestions;
+  if(selection) {
+    return await (await knexConnect())<PROMPT_TYPE>(TABLE)
+      .select("*")
+      .where(ID, selection.id);
+  } else {
+    return null;
+  }
 };
 
 
@@ -214,15 +226,21 @@ const deleteBook = async (guildId: string, title: string, type: BOOK_TYPES) => {
   return books;
 };
 
-const registerGuild = async (guildId: string, interaction: CommandInteraction) => {
+const registerGuild = async (guildId: string) => {
   const {
     TABLE,
   } = DB_CONSTANTS.GUILD_DB;
 
-    const guilds = await (await knexConnect())<GUILD>(TABLE)
+    try {
+      await (await knexConnect())<GUILD>(TABLE)
         .insert({guild_id: guildId});
-
-    return guilds;
+      return true;
+    } catch(error) {
+      if(error instanceof DatabaseError && error.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION) {
+        return false;
+      }
+      throw error;
+    }
 };
 
 const registerElevatedMember = async (guildId: string, userId: string, interaction: CommandInteraction) => {

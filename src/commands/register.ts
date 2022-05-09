@@ -6,13 +6,17 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 
 export const register = async (interaction: CommandInteraction) => {
   
-	try {
-    	await DB_COMMANDS.registerGuild(interaction.guildId, interaction);
+    try {
+        const registerSuccessful = await DB_COMMANDS.registerGuild(interaction.guildId);
 
-		interaction.reply(`I have succesfully registered your server!`);
-	} catch {
-		errorMessage(interaction, 'Something went wrong!');
-	}
+        if(registerSuccessful) {
+            await interaction.reply(`I have succesfully registered your server!`);
+        } else {
+            await errorMessage(interaction, 'This guild has already been registered.');
+        }
+    } catch {
+        await errorMessage(interaction, 'Something went wrong!');
+    }
 
 };
 
