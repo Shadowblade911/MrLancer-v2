@@ -1,5 +1,5 @@
 
-import { CommandInteraction, Interaction, TextChannel } from "discord.js";
+import { CommandInteraction, Interaction, InteractionReplyOptions, TextChannel } from "discord.js";
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
 import { SlashCommandBuilder, quote, inlineCode, blockQuote } from "@discordjs/builders";
@@ -30,7 +30,14 @@ export const prompt = async (interaction: CommandInteraction, followUp?: true) =
     };
 
     if(!followUp) {
-      await interaction.reply(message);
+      const reply: InteractionReplyOptions = {
+        content: `May I suggest the following by <@${user_id}>? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
+        allowedMentions: {
+          users: []
+        }
+      };
+
+      await interaction.reply(reply);
     } else {
       (await interaction.client.channels.fetch(interaction.channelId) as TextChannel).send(message)
     }
