@@ -1,0 +1,13 @@
+[Unit]
+Description=Backs up Mr Lancer's database
+Wants=network.target
+After=network.target
+
+[Service]
+# this should define RESTIC_REPOSITORY, RESTIC_PASSWORD, and any other variables
+# needed by your restic setup
+EnvironmentFile=/path/to/restic-config
+# this should define PUSHOVER_TOKEN and PUSHOVER_USER_KEY
+EnvironmentFile=/path/to/pushover-config
+ExecStart=/path/to/backup-lancer
+Type=oneshot

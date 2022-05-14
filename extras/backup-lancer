@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# adjust to match your config
+PGUSER=postgres
+PGDATABASE=lancer
+# this assumes a swarm stack name of "mrlancer" and a service name of "postgres"
+SERVICE_NAME=mrlancer_postgres
+BACKUP_DIR=/var/lib/mrlancer/backups
+DATE_FORMAT='%Y-%m-%d'
+
+# exit codes
+CONTAINER_NOT_FOUND=1
+FILE_BACKUP_FAILED=2
+RESTIC_NOT_CONFIGURED=3
+RESTIC_SNAPSHOT_FAILED=4
+RESTIC_SNAPSHOT_INCOMPLETE=5
+RESTIC_FAILED_UNKNOWN=6
+CREATING_BACKUP_DIR_FAILED=7
+
+# systemd log levels
+CRITICAL=2
+
+# pushover message priorities
+LOW=-1
+NORMAL=0
+
+send_pushover() {
+    local priority title OPTARG OPTIND
+    while getopts "p:t:" option; do
+        case "$option" in
+            p) priority="$OPTARG";;
+            t) title="$OPTARG";;
+            :) echo "-$OPTARG requires an argument, but none given." >&2; return 1;;
+            *) echo "Unrecognized option -$OPTARG." >&2; return 2;;
+        esac
+    done
+    shift $((OPTIND-1))
+
+    local message="$1"
+    local curl_args=(
+        --silent
+        --form-string "token=$PUSHOVER_TOKEN"
+        --form-string "user=$PUSHOVER_USER_KEY"
+        --form-string "message=$message"
+    )
+
+    [[ -n $priority ]] && curl_args+=(--form-string "priority=$priority")
+    [[ -n $title ]] && curl_args+=(--form-string "title=$title")
+
+    curl_args+=(https://api.pushover.net/1/messages.json)
+
+    curl "${curl_args[@]}"
+}
+
+if ! mkdir -p "$BACKUP_DIR"; then
+    echo "<$CRITICAL>Could not create backup directory '$BACKUP_DIR'!"
+    exit $CREATING_BACKUP_DIR_FAILED
+fi
+
+DATE="$(date "+${DATE_FORMAT}")"
+BACKUP_PATH="${BACKUP_DIR}/lancer-${DATE}.sql"
+
+CONTAINER_ID="$(docker container ls --filter=label=com.docker.swarm.service.name="${SERVICE_NAME}" --quiet)"
+if [[ -n $CONTAINER_ID ]]; then
+    if docker exec "$CONTAINER_ID" pg_dump --username="$PGUSER" "$PGDATABASE" > "$BACKUP_PATH"; then
+        echo "Backed up lancer database to '$BACKUP_PATH'."
+        send_pushover -t "Lancer backup" -p $LOW "Backed up Lancer database."
+    else
+        echo "<$CRITICAL>Failed to back up lancer database!"
+        send_pushover -t "Lancer backup failed" -p $NORMAL "Lancer database backup failed!"
+        exit $FILE_BACKUP_FAILED
+    fi
+else
+    echo "<$CRITICAL>Could not find container to back up!"
+    send_pushover -t "Lancer backup failed" -p $NORMAL "Could not find container to back up!"
+    exit $CONTAINER_NOT_FOUND
+fi
+
+if [[ -z $RESTIC_REPOSITORY || -z $RESTIC_PASSWORD ]]; then
+    echo "<$CRITICAL>restic not configured, cannot perform off-site backup!"
+    send_pushover -t "Offsite Lancer backup failed" -p $NORMAL "Failed to back up Lancer off-site due to missing restic config."
+    exit $RESTIC_NOT_CONFIGURED
+fi
+
+restic --verbose backup "$BACKUP_DIR"
+
+restic_exit=$?
+case $restic_exit in
+    0)
+        echo "Completed offsite backup of Lancer database."
+        send_pushover -t "Lancer backup" -p $LOW "Offsite backup completed."
+        exit 0
+        ;;
+    1)
+        echo "<$CRITICAL>restic could not create the snapshot!"
+        send_pushover -t "Offsite Lancer backup failed" -p $NORMAL "restic could not create the snapshot."
+        exit $RESTIC_SNAPSHOT_FAILED
+        ;;
+    3)
+        echo "<$CRITICAL>restic only made an incomplete snapshot!"
+        send_pushover -t "Offsite Lancer backup failed" -p $NORMAL "restic created an incomplete snapshot."
+        exit $RESTIC_SNAPSHOT_INCOMPLETE
+        ;;
+    *)
+        echo "<$CRITICAL>restic failed with unknown code $restic_exit"
+        send_pushover -t "Offsite Lancer backup failed" -p $NORMAL "restic failed with unknown code $restic_exit, check the logs."
+        exit $RESTIC_FAILED_UNKNOWN
+        ;;
+esac
