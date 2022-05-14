@@ -2,8 +2,7 @@
 import { CommandInteraction, Permissions } from "discord.js";
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
-import { quote, SlashCommandBuilder } from "@discordjs/builders";
-import { BOOK_TYPES, BOOK_TYPE_ARGS } from "../dbConstants/dbConstants";
+import { blockQuote, SlashCommandBuilder } from "@discordjs/builders";
 
 
 export const editPrompt = async (interaction: CommandInteraction) => {
@@ -12,7 +11,7 @@ export const editPrompt = async (interaction: CommandInteraction) => {
 
     const guildId = interaction.guildId;
     const id = interaction.options.getNumber(editPrompt.OPTIONS.id, true);
-    const suggestion = interaction.options.getString(editPrompt.OPTIONS.suggestion, true);
+    const suggestion = interaction.options.getString(editPrompt.OPTIONS.suggestion, true).replace('\\n', '\n');
 
     const prompt = await DB_COMMANDS.getSuggestion(guildId, id);
 
@@ -32,7 +31,7 @@ export const editPrompt = async (interaction: CommandInteraction) => {
       suggestion
     );
 
-    await interaction.reply(`I have updated the suggestion.\n\n${quote(suggestion)}`);
+    await interaction.reply(`I have updated the suggestion.\n\n${blockQuote(suggestion)}`);
   
 };
 
@@ -53,6 +52,6 @@ editPrompt.COMMAND =  new SlashCommandBuilder()
   )
   .addStringOption(option => option
     .setName(editPrompt.OPTIONS.suggestion)
-    .setDescription("The updated suggestion")
+    .setDescription("The updated suggestion. Use `\\n` for line breaks.")
     .setRequired(true)
   );

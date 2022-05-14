@@ -2,12 +2,12 @@
 import { CommandInteraction } from "discord.js";
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
-import { SlashCommandBuilder, quote } from "@discordjs/builders";
+import { SlashCommandBuilder } from "@discordjs/builders";
 
 
 export const suggest = async (interaction: CommandInteraction) => {
 
-    const suggestion = interaction.options.getString(suggest.OPTIONS.suggestion, true);
+    const suggestion = interaction.options.getString(suggest.OPTIONS.suggestion, true)?.replace('\\n', '\n');
     if(!suggestion){
       await errorMessage(interaction, "I need a suggestion!");
       return;  
@@ -19,7 +19,7 @@ export const suggest = async (interaction: CommandInteraction) => {
       interaction.member.user.id
     );
 
-    await interaction.reply(`${quote(suggestion)} \n\nThat's an excellent suggestion! I'll add it to the list`);
+    await interaction.reply(`> ${suggestion.replace('\n', '\n> ')}\n\nThat's an excellent suggestion! I'll add it to the list`);
   
 };
 
@@ -34,6 +34,6 @@ suggest.COMMAND =  new SlashCommandBuilder()
   .setDescription("Add a suggestion to the prompt list.")
   .addStringOption(option => option
     .setName(suggest.OPTIONS.suggestion)
-    .setDescription("Suggest a prompt.")
+    .setDescription("The suggestion. Use `\\n` for line breaks.")
     .setRequired(true)
   );
