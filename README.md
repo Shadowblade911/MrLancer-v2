@@ -27,3 +27,7 @@ http://localhost:8080.
 ## Deploying with Docker Swarm
 
 An example compose to use with Swarm is available in `docker-compose.swarm.example.yml`.
+
+## Extras
+
+For some useful ancillary files (such as backup scripts) see the `extras` folder.

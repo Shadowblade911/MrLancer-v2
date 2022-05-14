@@ -10,8 +10,6 @@ services:
       - PGDATABASE=lancer
     secrets:
       - source: lancer-config
-        target: /app/src/.env
-      - source: lancer-config
         target: /app/.env
     init: true
   postgres:
@@ -20,11 +18,22 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD_FILE=/run/secrets/lancer-postgres-password
       - POSTGRES_DB=lancer
+    volumes:
+      # this explicit, named, volume is *incredibly* important, without it the
+      # anonymous volume holding the database will be destroyed when the service
+      # is removed https://github.com/moby/moby/issues/37517
+      - lancer-pgdata:/var/lib/postgresql/data
     secrets:
       - lancer-postgres-password
 
 secrets:
+  # this should be a .env file with DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID and
+  # PGPASSWORD defined
   lancer-config:
     external: true
   lancer-postgres-password:
+    external: true
+
+volumes:
+  lancer-pgdata:
     external: true
