@@ -11,7 +11,12 @@ export const editPrompt = async (interaction: CommandInteraction) => {
 
     const guildId = interaction.guildId;
     const id = interaction.options.getNumber(editPrompt.OPTIONS.id, true);
-    const suggestion = interaction.options.getString(editPrompt.OPTIONS.suggestion, true).replace('\\n', '\n');
+    const suggestion = interaction
+      .options
+      .getString(editPrompt.OPTIONS.suggestion, true)
+      .split('\\n')
+      .map(line => line.trim())
+      .join('\n');
 
     const prompt = await DB_COMMANDS.getSuggestion(guildId, id);
 

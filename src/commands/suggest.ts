@@ -7,7 +7,13 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 
 export const suggest = async (interaction: CommandInteraction) => {
 
-    const suggestion = interaction.options.getString(suggest.OPTIONS.suggestion, true)?.replace('\\n', '\n');
+    const suggestion = interaction
+      .options
+      .getString(suggest.OPTIONS.suggestion, true)
+      .split('\\n')
+      .map(line => line.trim())
+      .join('\n');
+
     if(!suggestion){
       await errorMessage(interaction, "I need a suggestion!");
       return;  
@@ -19,7 +25,7 @@ export const suggest = async (interaction: CommandInteraction) => {
       interaction.member.user.id
     );
 
-    await interaction.reply(`> ${suggestion.replace('\n', '\n> ')}\n\nThat's an excellent suggestion! I'll add it to the list`);
+    await interaction.reply(`> ${suggestion.replace(/\n/g, '\n> ')}\n\nThat's an excellent suggestion! I'll add it to the list`);
   
 };
 
