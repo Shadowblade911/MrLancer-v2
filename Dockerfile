@@ -15,7 +15,6 @@ RUN npm ci && npm cache clean --force
 COPY --chown=node:node . .
 
 CMD npx knex --cwd src migrate:latest \
-    && npx ts-node src/deploy-commands.ts \
     && exec npx nodemon src/index.ts
 
 FROM base as build
@@ -35,5 +34,4 @@ RUN npm ci && npm cache clean --force
 COPY --chown=node:node --from=build /app/dist/ .
 
 CMD npx knex migrate:latest \
-    && node deploy-commands.js \
     && exec node index.js

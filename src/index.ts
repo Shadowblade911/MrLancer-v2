@@ -13,8 +13,11 @@ import { deleteBook } from "./commands/deleteBook";
 import { editPrompt } from "./commands/editprompt";
 import { addElevatedUser } from "./commands/addElevatedUser";
 import { removeElevatedUser } from "./commands/removeElevatedUser";
+import { deployCommands } from "./deploy-commands";
 
 dotenv.config({path:__dirname+"/.env"});
+
+deployCommands();
 
 const intents = new Intents();
 intents.add(Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS);
