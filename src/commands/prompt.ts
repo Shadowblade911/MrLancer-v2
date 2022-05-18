@@ -3,6 +3,7 @@ import { CommandInteraction, Interaction, InteractionReplyOptions, TextChannel }
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
 import { SlashCommandBuilder, quote, inlineCode, blockQuote } from "@discordjs/builders";
+import { renderPrompt } from "../utils/renderPrompt";
 
 
 export const prompt = async (interaction: CommandInteraction, followUp?: true) => {
@@ -16,16 +17,15 @@ export const prompt = async (interaction: CommandInteraction, followUp?: true) =
       return;
     }
 
+    const suggestion = result[0];
     const {
-        id, 
-        user_id,
-        prompt
-    } = result[0];
+      user_id
+    } = suggestion;
 
     const creditLine = user_id ? ` by <@${user_id}>` : '';
     
     const message = {
-      content: `May I suggest the following${creditLine}? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
+      content: `May I suggest the following${creditLine}?\n${renderPrompt(suggestion)}`,
       options: {
         allowedMentions: { users: [] }
       }
@@ -33,7 +33,7 @@ export const prompt = async (interaction: CommandInteraction, followUp?: true) =
 
     if(!followUp) {
       const reply: InteractionReplyOptions = {
-        content: `May I suggest the following${creditLine}? \nSuggestion #${inlineCode(id.toString())}:\n\n${blockQuote(prompt)}`,
+        content: `May I suggest the following${creditLine}?\n${renderPrompt(suggestion)}`,
         allowedMentions: {
           users: []
         }

@@ -2,7 +2,8 @@
 import { CommandInteraction } from "discord.js";
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { codeBlock, SlashCommandBuilder } from "@discordjs/builders";
+import { renderPrompt } from "../utils/renderPrompt";
 
 
 export const suggest = async (interaction: CommandInteraction) => {
@@ -25,7 +26,7 @@ export const suggest = async (interaction: CommandInteraction) => {
       interaction.member.user.id
     );
 
-    await interaction.reply(`> ${suggestion.replace(/\n/g, '\n> ')}\n\nThat's an excellent suggestion! I'll add it to the list`);
+    await interaction.reply(`That's an excellent suggestion! I'll add it to the list\n${renderPrompt(result[0])}`);
   
 };
 

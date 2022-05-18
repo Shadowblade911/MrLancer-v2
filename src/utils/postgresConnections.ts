@@ -135,9 +135,9 @@ const addSuggestion = async (guildId:string, suggestion: string, userId: string)
     } = DB_CONSTANTS.PROMPTS;
 
     const prompt = (await knexConnect())<PROMPT_TYPE>(TABLE)
-        .insert({guild_id: guildId, prompt: suggestion, user_id: userId});
+      .insert({guild_id: guildId, prompt: suggestion, user_id: userId}, '*')
 
-    return prompt
+    return prompt;
 }
 
 const fetchSuggestion = async (guildId: string) => {
@@ -204,7 +204,8 @@ const editSuggestion = async (guildId: string, id: number, suggestion: string) =
     const suggestions = await (await knexConnect())<PROMPT_TYPE>(TABLE)
     .where(GUILD_ID, guildId)
     .andWhere(ID, id)
-    .update({prompt: suggestion});
+    .update({prompt: suggestion})
+    .returning('*');
 
     return suggestions;
 }

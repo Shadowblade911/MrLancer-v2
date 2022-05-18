@@ -3,6 +3,7 @@ import { CommandInteraction, Permissions } from "discord.js";
 import { errorMessage } from "../utils/errorMessage";
 import { DB_COMMANDS } from "../utils/postgresConnections";
 import { blockQuote, SlashCommandBuilder } from "@discordjs/builders";
+import { renderPrompt } from "../utils/renderPrompt";
 
 
 export const editPrompt = async (interaction: CommandInteraction) => {
@@ -30,14 +31,18 @@ export const editPrompt = async (interaction: CommandInteraction) => {
       return;  
     }
 
-    await DB_COMMANDS.editSuggestion(
+    const edited = await DB_COMMANDS.editSuggestion(
       interaction.guildId, 
       id,
       suggestion
     );
 
-    await interaction.reply(`I have updated the suggestion.\n\n${blockQuote(suggestion)}`);
-  
+    if(!edited || edited.length == 0){
+      console.error('Error editing prompt', {edited});
+      await errorMessage(interaction, "There was an issue editing your prompt");
+    } else {
+      await interaction.reply(`I have updated the suggestion.\n${renderPrompt(edited[0])}`);
+    }
 };
 
 
